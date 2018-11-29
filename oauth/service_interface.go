@@ -5,6 +5,7 @@ import (
 	"github.com/RichardKnop/go-oauth2-server/models"
 	"github.com/RichardKnop/go-oauth2-server/session"
 	"github.com/RichardKnop/go-oauth2-server/util/routes"
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
@@ -45,4 +46,5 @@ type ServiceInterface interface {
 	NewIntrospectResponseFromRefreshToken(refreshToken *models.OauthRefreshToken) (*IntrospectResponse, error)
 	ClearUserTokens(userSession *session.UserSession)
 	Close()
+	RegisterGinRoutes(router *gin.Engine, prefix string)
 }

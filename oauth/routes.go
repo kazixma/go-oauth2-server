@@ -2,6 +2,7 @@ package oauth
 
 import (
 	"github.com/RichardKnop/go-oauth2-server/util/routes"
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/mux"
 )
 
@@ -34,4 +35,10 @@ func (s *Service) GetRoutes() []routes.Route {
 			HandlerFunc: s.introspectHandler,
 		},
 	}
+}
+
+func (s *Service) RegisterGinRoutes(router *gin.Engine, prefix string) {
+	subRouter := router.Group(prefix)
+	subRouter.POST(tokensPath, gin.WrapF(s.tokensHandler))
+	subRouter.POST(introspectPath, gin.WrapF(s.introspectHandler))
 }

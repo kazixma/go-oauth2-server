@@ -1,27 +1,27 @@
 version: "2"
 
 services:
-  etcd:
-    image: quay.io/coreos/etcd
-    command: etcd --initial-cluster-state new --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://127.0.0.1:2379
-    volumes:
-      - "etcd-data:/default.etcd"
-    environment:
-      - ETCDCTL_API=3
+  # etcd:
+  #   image: quay.io/coreos/etcd
+  #   command: etcd --initial-cluster-state new --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://127.0.0.1:2379
+  #   volumes:
+  #     - "etcd-data:/default.etcd"
+  #   environment:
+  #     - ETCDCTL_API=3
 
-  etcd_config:
-    build:
-      context: .
-      dockerfile: ./Dockerfile-etcd-config
-    volumes:
-      - "etcd-data:/default.etcd"
-    environment:
-      - ETCDCTL_API=3
-      - ETCDCTL_ENDPOINTS=etcd:2379
-    depends_on:
-      - etcd
-    links:
-      - etcd
+  # etcd_config:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile-etcd-config
+  #   volumes:
+  #     - "etcd-data:/default.etcd"
+  #   environment:
+  #     - ETCDCTL_API=3
+  #     - ETCDCTL_ENDPOINTS=etcd:2379
+  #   depends_on:
+  #     - etcd
+  #   links:
+  #     - etcd
 
   postgres:
     image: "postgres"
@@ -30,42 +30,44 @@ services:
     environment:
       PGDATA: "/var/lib/postgresql/data/pgdata"
       POSTGRES_USER: "go_oauth2_server"
-      POSTGRES_PASSWORD: ""
+      POSTGRES_PASSWORD: "123456"
       POSTGRES_DB: "go_oauth2_server"
-
-  app:
-    container_name: go_oauth2_server
-    image: go-oauth2-server:latest
-    depends_on:
-      - etcd_config
-      - postgres
-    links:
-      - etcd
-      - postgres
-    build:
-      context: .
-      dockerfile: ./Dockerfile
     ports:
-      - "8080:8080"
-    environment:
-      ETCD_ENDPOINTS: "http://etcd:2379"
-    command: [runserver]
+      - "5432:5432"
 
-  app_testdata:
-    container_name: go_oauth2_server_testdata
-    image: go-oauth2-server:latest
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    environment:
-      ETCD_ENDPOINTS: "http://etcd:2379"
-    depends_on:
-      - etcd_config
-      - postgres
-    links:
-      - etcd
-      - postgres
-    command: ["loaddata", "oauth/fixtures/test_clients.yml"]
+  # app:
+  #   container_name: go_oauth2_server
+  #   image: go-oauth2-server:latest
+  #   depends_on:
+  #     - etcd_config
+  #     - postgres
+  #   links:
+  #     - etcd
+  #     - postgres
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     ETCD_ENDPOINTS: "http://etcd:2379"
+  #   command: [runserver]
+
+  # app_testdata:
+  #   container_name: go_oauth2_server_testdata
+  #   image: go-oauth2-server:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   environment:
+  #     ETCD_ENDPOINTS: "http://etcd:2379"
+  #   depends_on:
+  #     - etcd_config
+  #     - postgres
+  #   links:
+  #     - etcd
+  #     - postgres
+  #   command: ["loaddata", "oauth/fixtures/test_clients.yml"]
 
 volumes:
   etcd-data:
